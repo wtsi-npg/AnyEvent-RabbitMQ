@@ -203,16 +203,24 @@ sub _start {
     my $self = shift;
     my %args = @_;
 
+    my $header = Net::AMQP::Protocol->header;
     if ($self->{verbose}) {
         warn 'post header', "\n";
+        warn '[C] --> [S] ' . Dumper($header);
+        warn '-----------', "\n";
     }
 
-    $self->{_handle}->push_write(Net::AMQP::Protocol->header);
+    $self->{_handle}->push_write($header);
 
     $self->_push_read_and_valid(
         'Connection::Start',
         sub {
             my $frame = shift;
+
+            if ($self->{verbose}) {
+                warn '[C] <-- [S] ' . Dumper($frame);
+                warn '-----------', "\n";
+            }
 
             my @mechanisms = split /\s/, $frame->method_frame->mechanisms;
             return $args{on_failure}->('AMQPLAIN is not found in mechanisms')
@@ -224,22 +232,27 @@ sub _start {
 
             $self->{_server_properties} = $frame->method_frame->server_properties;
 
-            $self->_push_write(
-                Net::AMQP::Protocol::Connection::StartOk->new(
-                    client_properties => {
-                        platform    => 'Perl',
-                        product     => __PACKAGE__,
-                        information => 'http://d.hatena.ne.jp/cooldaemon/',
-                        version     => __PACKAGE__->VERSION,
-                    },
-                    mechanism => 'AMQPLAIN',
-                    response => {
-                        LOGIN    => $args{user},
-                        PASSWORD => $args{pass},
-                    },
-                    locale => 'en_US',
-                ),
+            $frame = Net::AMQP::Protocol::Connection::StartOk->new(
+                client_properties => {
+                    platform    => 'Perl',
+                    product     => __PACKAGE__,
+                    information => 'http://d.hatena.ne.jp/cooldaemon/',
+                    version     => __PACKAGE__->VERSION,
+                },
+                mechanism => 'AMQPLAIN',
+                response => {
+                    LOGIN    => $args{user},
+                    PASSWORD => $args{pass},
+                },
+                locale => 'en_US',
             );
+
+            if ($self->{verbose}) {
+                warn '[C] --> [S] ' . Dumper($frame);
+                warn '-----------', "\n";
+            }
+
+            $self->_push_write($frame);
 
             $self->_tune(%args,);
         },
