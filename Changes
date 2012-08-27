@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.0701	Sun Aug 26 17:58:59 PDT 2012
+	- Fix potential memory leak on recieve errors
+	- Ensure all callbacks are made when channel closes
+	- Fix spelling
+	- Improve diagnostic dumps
+
 1.07    Tue Aug 21 15:47:00 2012
         - Fix dist by putting missing version numbers back into
           all the modules.
