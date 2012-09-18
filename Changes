@@ -1,5 +1,12 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.0802	Chip Salzenberg private release
+	- Support flow control (no dropped messages)
+	- Support async CancelOk
+	- Support server-sent Nack
+	- Better test suite
+	- etc.
+
 1.0801	Chip Salzenberg private release
 	- Support AMQP 0.9
 	- Support confirm mode; add "on_ack" callback to publish
