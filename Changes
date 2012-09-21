@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.0803	Chip Salzenberg private release
+	- Fix on_return for unconfirmed publish
+
 1.0802	Chip Salzenberg private release
 	- Support flow control (no dropped messages)
 	- Support async CancelOk
