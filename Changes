@@ -1,5 +1,10 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.1201  Thu Apr 25 02:41:10 2013
+  - Require Net::AMQP 0.0502, and use it to:
+     + Get notifications of queue deletion
+     + Correctly encode user-provided header strings that look like numbers
+
 1.12  Thu Apr 11 20:45:00 2013
   - Allow AMQP client to adjust tuning, e.g. heartbeat
     (Chip Salzenberg)
