@@ -4,7 +4,7 @@ name 'AnyEvent-RabbitMQ';
 all_from 'lib/AnyEvent/RabbitMQ.pm';
 
 requires 'List::MoreUtils';
-requires 'Net::AMQP';
+requires 'Net::AMQP' => '0.0502';
 requires 'AnyEvent';
 requires 'Devel::GlobalDestruction';
 requires 'namespace::clean';

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use AnyEvent::RabbitMQ::LocalQueue;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw( looks_like_number weaken );
 use Carp qw(croak);
 BEGIN { *Dumper = \&AnyEvent::RabbitMQ::Dumper }
 
@@ -391,6 +391,16 @@ sub _header {
 
     my $weight = delete $args->{weight} || 0;
 
+    # user-provided message headers must be strings.  protect values that look like numbers.
+    my $headers = $args->{headers} || {};
+    my @prot = grep { my $v = $headers->{$_}; !ref($v) && looks_like_number($v) } keys %$headers;
+    if (@prot) {
+        $headers = {
+            %$headers,
+            map { $_ => Net::AMQP::Value::String->new($headers->{$_}) } @prot
+        };
+    }
+
     $self->{connection}->_push_write(
         Net::AMQP::Frame::Header->new(
             weight       => $weight,
@@ -398,7 +408,6 @@ sub _header {
             header_frame => Net::AMQP::Protocol::Basic::ContentHeader->new(
                 content_type     => 'application/octet-stream',
                 content_encoding => undef,
-                headers          => {},
                 delivery_mode    => 1,
                 priority         => 1,
                 correlation_id   => undef,
@@ -410,6 +419,7 @@ sub _header {
                 app_id           => undef,
                 cluster_id       => undef,
                 %$args,
+                headers          => $headers,
             ),
         ),
         $self->{id},

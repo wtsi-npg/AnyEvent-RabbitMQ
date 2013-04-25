@@ -264,7 +264,8 @@ sub _start {
                         platform    => 'Perl',
                         product     => __PACKAGE__,
                         information => 'http://d.hatena.ne.jp/cooldaemon/',
-                        version     => __PACKAGE__->VERSION,
+                        version     => Net::AMQP::Value::String->new(__PACKAGE__->VERSION),
+                        consumer_cancel_notify => Net::AMQP::Value::true,
                     },
                     mechanism => 'AMQPLAIN',
                     response => {
