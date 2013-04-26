@@ -31,8 +31,7 @@ sub _reset {
         _is_confirm    => 0,
         _publish_tag   => 0,
         _publish_cbs   => {},  # values: [on_ack, on_nack, on_return]
-        _consumer_cbs  => {},
-        _consumer_cans => {},
+        _consumer_cbs  => {},  # values: [on_consume, on_cancel...]
     );
     @$self{keys %a} = values %a;
 
@@ -123,7 +122,7 @@ sub close {
         sub {
             my $me = $wself or return;
             $me->_close($close_frame, 0);
-            $args{on_failure}->();
+            $args{on_failure}->(@_);
         },
         $self->{id},
     );
@@ -446,7 +445,8 @@ sub consume {
     return $self if !$self->_check_open($failure_cb);
 
     my $consumer_cb = delete $args{on_consume} || sub {};
-    
+    my $cancel_cb   = delete $args{on_cancel} || sub {};
+
     $self->{connection}->_push_write_and_read(
         'Basic::Consume',
         {
@@ -454,6 +454,7 @@ sub consume {
             no_local     => 0,
             no_ack       => 1,
             exclusive    => 0,
+
             %args, # queue
             ticket       => 0,
             nowait       => 0, # FIXME
@@ -461,9 +462,8 @@ sub consume {
         'Basic::ConsumeOk', 
         sub {
             my $frame = shift;
-            $self->{_consumer_cbs}->{
-                $frame->method_frame->consumer_tag
-            } = $consumer_cb;
+            my $tag = $frame->method_frame->consumer_tag;
+            $self->{_consumer_cbs}{$tag} = [ $consumer_cb, $cancel_cb ];
             $cb->($frame);
         },
         $failure_cb,
@@ -484,12 +484,12 @@ sub cancel {
         return $self;
     }
 
-    if (!$self->{_consumer_cbs}->{$args{consumer_tag}}) {
+    my $cons_cbs = $self->{_consumer_cbs}{$args{consumer_tag}};
+    unless ($cons_cbs) {
         $failure_cb->('Unknown consumer_tag');
         return $self;
     }
-
-    $self->{_consumer_cans}{$args{consumer_tag}} = $cb;
+    push @$cons_cbs, $cb;
 
     $self->{connection}->_push_write(
         Net::AMQP::Protocol::Basic::Cancel->new(
@@ -709,17 +709,22 @@ sub push_queue_or_consume {
             $self->_close($frame, 0);
             return $self;
         } elsif ($method_frame->isa('Net::AMQP::Protocol::Basic::Deliver')) {
-            my $cb = $self->{_consumer_cbs}->{
-                $method_frame->consumer_tag
-            } || sub {};
+            my $cons_cbs = $self->{_consumer_cbs}{$method_frame->consumer_tag};
+            my $cb = ($cons_cbs && $cons_cbs->[0]) || sub {};
             $self->_push_read_header_and_body('deliver', $frame, $cb, $failure_cb);
             return $self;
-        } elsif ($method_frame->isa('Net::AMQP::Protocol::Basic::CancelOk')) {
-            my $can_cb = delete $self->{_consumer_cans}{$method_frame->consumer_tag};
-            if ($can_cb) {
-                $can_cb->($method_frame);
+        } elsif ($method_frame->isa('Net::AMQP::Protocol::Basic::CancelOk') ||
+                 $method_frame->isa('Net::AMQP::Protocol::Basic::Cancel')) {
+            # CancelOk means we asked for a cancel.
+            # Cancel means queue was deleted; it is not AMQP, but RMQ supports it.
+            my $cons_cbs = delete $self->{_consumer_cbs}{$method_frame->consumer_tag};
+            if ($cons_cbs) {
+                shift @$cons_cbs; # no more deliveries
+                for my $cb (reverse @$cons_cbs) {
+                    $cb->($method_frame);
+                }
             }
-            else {
+            elsif ($method_frame->isa('Net::AMQP::Protocol::Basic::CancelOk')) {
                 $failure_cb->("Received CancelOk for unknown consumer tag " . $method_frame->consumer_tag);
             }
             return $self;
@@ -1031,6 +1036,12 @@ Arguments:
 =item on_consume
 
 Callback called with an argument of the message which has been consumed.
+
+=item on_cancel
+
+Callback called if consumption is canceled.  This may be at client request
+or as a side effect of queue deletion.  (Notification of queue deletion is a
+RabbitMQ extension.)
 
 =item consumer_tag
 
