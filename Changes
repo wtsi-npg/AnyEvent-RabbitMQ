@@ -1,5 +1,13 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.1202
+  - Expect server to send heartbeats as promised.  If it doesn't, go President Madagasgar on its ass.
+  - Safety (correctness) rearrangement, incl. eliminating bad circular references.
+  - Fix major missing pieces in server-sent consume cancel.
+  - Fix race between server-sent and client-sent cancellation.
+  - Document consume on_cancel callback.
+  - Make test output clearer.
+
 1.1201  Thu Apr 25 02:41:10 2013
   - Require Net::AMQP 0.0502, and use it to:
      + Get notifications of queue deletion

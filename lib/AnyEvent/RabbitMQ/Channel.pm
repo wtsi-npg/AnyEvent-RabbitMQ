@@ -10,7 +10,7 @@ BEGIN { *Dumper = \&AnyEvent::RabbitMQ::Dumper }
 
 use namespace::clean;
 
-our $VERSION = '1.1201';
+our $VERSION = '1.1202';
 
 sub new {
     my $class = shift;
