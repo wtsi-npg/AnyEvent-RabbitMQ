@@ -290,8 +290,10 @@ sub _start {
                         information  => 'http://d.hatena.ne.jp/cooldaemon/',
                         version      => Net::AMQP::Value::String->new(__PACKAGE__->VERSION),
                         capabilities => {
-                            consumer_cancel_notify => Net::AMQP::Value::true,
+                            consumer_cancel_notify     => Net::AMQP::Value::true,
+                            exchange_exchange_bindings => Net::AMQP::Value::true,
                         },
+                        %{ $args{client_properties} || {} },
                     },
                     mechanism => 'AMQPLAIN',
                     response => {
