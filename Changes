@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::RabbitMQ
 
+1.1203
+  - Allow customized client_properties on connection.
+
 1.1202
   - Expect server to send heartbeats as promised.  If it doesn't, go President Madagasgar on its ass.
   - Safety (correctness) rearrangement, incl. eliminating bad circular references.
