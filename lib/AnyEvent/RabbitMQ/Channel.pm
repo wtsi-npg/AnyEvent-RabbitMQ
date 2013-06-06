@@ -12,13 +12,13 @@ BEGIN { *Dumper = \&AnyEvent::RabbitMQ::Dumper }
 
 use namespace::clean;
 
+our $VERSION = '1.1301';
+
 use constant {
     _ST_CLOSED => 0,
     _ST_OPENING => 1,
     _ST_OPEN => 2,
 };
-
-our $VERSION = '1.13';
 
 sub new {
     my $class = shift;
