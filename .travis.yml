@@ -8,6 +8,7 @@ services:
 
 install:
   - cpanm --notest Module::Install::AuthorTests
+  - cpanm --notest Readonly
   - cpanm --notest Net::AMQP
   - cpanm --notest AnyEvent
   - cpanm --notest Devel::GlobalDestruction
