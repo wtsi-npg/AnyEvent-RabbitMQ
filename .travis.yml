@@ -4,4 +4,11 @@ perl:
   - "5.16"
 
 services:
-  -rabbitmq
+  - rabbitmq
+
+install:
+  - cpanm --quiet --notest Module::Install::AuthorTests
+  - cpanm --quiet --notest Readonly
+  - cpanm --quiet --notest Net::AMQP
+  - cpanm --quiet --notest AnyEvent
+  - cpanm --quiet --notest Devel::GlobalDestruction
