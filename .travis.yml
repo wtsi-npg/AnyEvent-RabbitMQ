@@ -5,3 +5,8 @@ perl:
 
 services:
   -rabbitmq
+
+install:
+  - cpanm --notest Net::AMQP
+  - cpanm --notest AnyEvent
+  - cpanm --notest Devel::GlobalDestruction
