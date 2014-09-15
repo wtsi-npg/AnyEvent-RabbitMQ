@@ -3,8 +3,6 @@ env:
   global:
     - secure: TnTGMjGO4i2SgcDtqOKADL1/0iHI3SomEDqn2/9+5vepTmOxPTkEYSwgtcvw0HLBnB5rHFvpi5FcUZCXEbe9OuaR2re2nyQFOw5Cz03CB9L4iNwtlE1OUUhCPsKI7skrkhTjDxJ/eXdaKOY2ER6Wt55BzKaQysRSkf6ApJKbFjE=
 
-    - GIT_DESC=$(git describe --always --dirty)
-
 language: perl
 
 perl:
@@ -17,7 +15,6 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y aspell
 
-
 install:
   - cpanm --quiet --notest AnyEvent
   - cpanm --quiet --notest Devel::GlobalDestruction
@@ -26,6 +23,9 @@ install:
   - cpanm --quiet --notest Readonly
   - cpanm --quiet --notest Test::Perl::Critic
   - cpanm --quiet --notest Test::Spelling
+
+before_script:
+  - export GIT_DESC=`git describe --always | tr -d '\012'`
 
 after_script:
   - Completed AnyEvent-RabbitMQ-${GIT_DESC}
