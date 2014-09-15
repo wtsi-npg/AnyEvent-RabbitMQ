@@ -24,23 +24,20 @@ install:
   - cpanm --quiet --notest Test::Perl::Critic
   - cpanm --quiet --notest Test::Spelling
 
-before_script:
-  - export GIT_DESC=`git describe --always | tr -d '\012'`
-
 after_script:
-  - Completed AnyEvent-RabbitMQ-${GIT_DESC}
+  - Completed AnyEvent-RabbitMQ-${TRAVIS_TAG}
 
 before_deploy:
-  - echo Deploying AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
+  - echo Deploying AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
 
 deploy:
   provider: releases
   api-key: $GH_OAUTH
-  file: AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
+  file: AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
   skip_cleanup: true
   on:
-    tags: false
+    tags: true
     all_branches: true
 
 after_deploy:
-  - echo Deployed AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
+  - echo Deployed AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
