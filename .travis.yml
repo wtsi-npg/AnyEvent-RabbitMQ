@@ -2,6 +2,7 @@
 env:
   global:
     - secure: TnTGMjGO4i2SgcDtqOKADL1/0iHI3SomEDqn2/9+5vepTmOxPTkEYSwgtcvw0HLBnB5rHFvpi5FcUZCXEbe9OuaR2re2nyQFOw5Cz03CB9L4iNwtlE1OUUhCPsKI7skrkhTjDxJ/eXdaKOY2ER6Wt55BzKaQysRSkf6ApJKbFjE=
+  env: GIT_DESC=$(git describe --always --dirty)
 
 language: perl
 
@@ -25,17 +26,20 @@ install:
   - cpanm --quiet --notest Test::Perl::Critic
   - cpanm --quiet --notest Test::Spelling
 
+after_script:
+  - Completed AnyEvent-RabbitMQ-${GIT_DESC
+
 before_deploy:
-  - echo "Deploying AnyEvent-RabbitMQ-$TRAVIS_TAG.tar.gz"
+  - echo Deploying AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
 
 deploy:
   provider: releases
   api-key: $GH_OAUTH
-  file: AnyEvent-RabbitMQ-$TRAVIS_TAG.tar.gz
+  file: AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
   skip_cleanup: true
   on:
     tags: false
     all_branches: true
 
 after_deploy:
-  - echo "Deployed AnyEvent-RabbitMQ-$TRAVIS_TAG.tar.gz"
+  - echo Deployed AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
