@@ -27,7 +27,7 @@ install:
   - cpanm --quiet --notest Test::Spelling
 
 after_script:
-  - Completed AnyEvent-RabbitMQ-${GIT_DESC
+  - Completed AnyEvent-RabbitMQ-${GIT_DESC}
 
 before_deploy:
   - echo Deploying AnyEvent-RabbitMQ-${GIT_DESC}.tar.gz
