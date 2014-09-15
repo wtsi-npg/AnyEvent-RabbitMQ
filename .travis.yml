@@ -1,8 +1,3 @@
-
-env:
-  global:
-    - secure: TnTGMjGO4i2SgcDtqOKADL1/0iHI3SomEDqn2/9+5vepTmOxPTkEYSwgtcvw0HLBnB5rHFvpi5FcUZCXEbe9OuaR2re2nyQFOw5Cz03CB9L4iNwtlE1OUUhCPsKI7skrkhTjDxJ/eXdaKOY2ER6Wt55BzKaQysRSkf6ApJKbFjE=
-
 language: perl
 
 perl:
@@ -23,12 +18,3 @@ install:
   - cpanm --quiet --notest Readonly
   - cpanm --quiet --notest Test::Perl::Critic
   - cpanm --quiet --notest Test::Spelling
-
-deploy:
-  provider: releases
-  api-key: $GH_OAUTH
-  file: AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
-  skip_cleanup: true
-  on:
-    tags: true
-    all_branches: true
