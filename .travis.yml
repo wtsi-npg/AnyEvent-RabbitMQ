@@ -24,12 +24,6 @@ install:
   - cpanm --quiet --notest Test::Perl::Critic
   - cpanm --quiet --notest Test::Spelling
 
-after_script:
-  - Completed AnyEvent-RabbitMQ-${TRAVIS_TAG}
-
-before_deploy:
-  - echo Deploying AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
-
 deploy:
   provider: releases
   api-key: $GH_OAUTH
@@ -38,6 +32,3 @@ deploy:
   on:
     tags: true
     all_branches: true
-
-after_deploy:
-  - echo Deployed AnyEvent-RabbitMQ-${TRAVIS_TAG}.tar.gz
